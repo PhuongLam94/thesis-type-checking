@@ -69,7 +69,7 @@ public:
 		 * Constructor with name, native address and optional bLib.
 		 */
 		Proc(Prog *prog, ADDRESS uNative, Signature *sig);
-                //std::list<UnionDefine*> unionDefine;
+                std::list<UnionDefine*> unionDefine;
                 std::map<char*, AssemblyArgument*> replacement;
                 std::map<char*, int> bitVar;
 

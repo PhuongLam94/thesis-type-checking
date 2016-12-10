@@ -530,7 +530,7 @@ public:
 		void		getLiveOut(LocationSet& live, LocationSet& phiLocs);
 
                 bool            calcReachingDef();
-                void            checkUnion(std::list<UnionDefine*> unionDefine);
+                bool            checkUnion(std::list<UnionDefine*> unionDefine);
                 bool            makeUnion(std::list<UnionDefine*>& unionDefine, std::map<char*, AssemblyArgument*> replacement, std::map<char*, int> bitVar2);
                 bool            makeUnion(std::list<UnionDefine*>& unionDefine, char* bitVar, char* byteVar, std::map<char*, int> bitVar2, bool reCall=false);
                 bool            makeUnion_new(std::list<UnionDefine*>& unionDefine, std::map<char*, AssemblyArgument*> replacement, std::map<char*, int> bitVar2, std::map<Exp*, ConstantVariable*> mapExp);

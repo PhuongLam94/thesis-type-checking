@@ -695,7 +695,7 @@ bool FrontEnd::processProc(ADDRESS uAddr, UserProc* pProc, std::ofstream &os, bo
 				pBB = pCfg->newBB(BB_rtls, INVALID, 0);
 				sequentialDecode = false; BB_rtls = NULL; continue;
 			}
-            //pProc->unionDefine = new list<UnionDefine*>();
+            pProc->unionDefine = *AssProgram->unionDefine;
             pProc->bitVar = AssProgram->bitVar;
             pProc->replacement = AssProgram->replacement;
 			// alert the watchers that we have decoded an instruction

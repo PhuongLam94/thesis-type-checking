@@ -1359,7 +1359,8 @@ void Prog::decompile() {
 
 }
 bool Prog::unionCheck(){
-    unionDefine.clear();
+    unionDefine = (*entryProcs.begin())->unionDefine;
+    bool valid = true;
     assert(m_procs.size());
     if (VERBOSE)
             LOG << (int)m_procs.size() << " procedures\n";
@@ -1372,7 +1373,7 @@ bool Prog::unionCheck(){
                     LOG << "decompiling entry point " << (*ee)->getName() << "\n";
             int indent = 0;
             if(!(*ee)->unionCheck(unionDefine, map))
-                return false;
+                valid = false;
 
     }
 
@@ -1388,12 +1389,12 @@ bool Prog::unionCheck(){
                             if (proc->isDecompiled()) continue;
                             int indent = 0;
                             if(!proc->unionCheck(unionDefine, map))
-                                return false;
+                                valid = false;
                             foundone = true;
                     }
             }
     }
-
+    if (valid){
     std::map<char*, AssemblyArgument*> replacement = ((UserProc*) (*entryProcs.begin()))->replacement;
     std::map<char*, AssemblyArgument*>::iterator mit;
     list<UnionDefine*>::iterator it2;
@@ -1438,7 +1439,6 @@ bool Prog::unionCheck(){
 //        }
         ut_temp->addType(ct_temp, "bits");
         globals.insert(new Global(ut_temp, NULL, ud->byteVar));
-
     }
     for (ee = entryProcs.begin(); ee != entryProcs.end(); ++ee) {
     //std::cerr << "decompiling entry point" << (*ee)->getName() << "\n";
@@ -1466,6 +1466,9 @@ bool Prog::unionCheck(){
             }
     }
     return true;
+    } else {
+        return false;
+    }
 }
 void Prog::constantPropagation(){
     std::cout<<"Into constant propagation of program"<<std::endl;

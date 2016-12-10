@@ -1341,21 +1341,19 @@ bool UserProc::unionCheck(std::list<UnionDefine*>& unionDefine, std::map<Exp*, C
                 setStatus(PROC_VISITED); 					// We have at least visited this proc "on the way down"
                                                 // Append this proc to path
          BB_IT it;
+         bool valid = true;
                 // Recurse to children first, to perform a depth first search
                 //initialiseDecompile();
 
                 // Look at each call, to do the DFS
                 for (PBB bb = cfg->getFirstBB(it); bb; bb = cfg->getNextBB(it)) {
-                    //bb->calcReachingDef();
-                    //bb->checkUnion(unionDefine);
-                    //unionDefine.clear();
-
-                   if(!bb->makeUnion_new(unionDefine, replacement, bitVar, mapExp))
-                       //cout<<"proc check union is false"<<endl;
-                       return false;
+                    bb->calcReachingDef();
+                    if(!bb->checkUnion(unionDefine)){
+                        valid = false;
+                    }
                    status = PROC_FINAL;
                 }
-                return true;
+                return valid;
 
 }
 void UserProc::replaceAcc(std::list<UnionDefine*>& unionDefine, std::map<Exp*, ConstantVariable*> mapExp) {
@@ -1828,7 +1826,7 @@ void UserProc::remUnusedStmtEtc(std::map<Exp*, ConstantVariable*>&map, std::list
 	// Count the references first
 	countRefs(refCounts);
     checkAccAssign();
-    constantPropagation(map);
+    //constantPropagation(map);
 //    if(!unionCheck(unionDefine, map)){
 //        std::cout<<"THERE ARE SOME PROBLEMS WITH UNION MAKING, STOP DECOMPILING NOW..."<<endl;
 //        exit(1);

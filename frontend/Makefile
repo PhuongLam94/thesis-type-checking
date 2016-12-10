@@ -12,7 +12,7 @@
 # 08 Apr 02 - Mike: Created.
 # 10 Apr 02 - Mike: interface -> include
 
-top_srcdir = ..
+top_srcdir = /home/phuong/type-checking
 
 FRONTEND_LIB = $(top_srcdir)/lib/libfrontend.so
 TEST_OBJS = FrontSparcTest.o FrontPentTest.o # FrontendTest.o 

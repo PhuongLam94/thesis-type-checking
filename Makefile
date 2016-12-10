@@ -47,7 +47,7 @@
 # Variables detected by ./configure
 #
 
-top_srcdir = .
+top_srcdir = /home/phuong/type-checking
 
 # HOST_GNU_LD is "yes" if the linker on this host machine is GNU
 HOST_GNU_LD = yes

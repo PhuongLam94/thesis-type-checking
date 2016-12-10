@@ -1703,28 +1703,19 @@ bool BasicBlock::calcLiveness(ConnectionGraph& ig, UserProc* myProc) {
 		// No change
 		return false;
 }
-void BasicBlock::checkUnion(list<UnionDefine*> unionDefine){
+bool BasicBlock::checkUnion(list<UnionDefine*> unionDefine){
     std::cout<<"==============================="<<endl;
     std::cout<<"UNION CHECKING AREA"<<endl;
+    bool valid = true;
     std::list<RTL*>::iterator rit;
     for (rit = m_pRtls->begin(); rit != m_pRtls->end(); rit++){
         std::list<Statement*>& stmts = (*rit)->getList();
         std::list<Statement*>::iterator sit;
         for (sit = stmts.begin(); sit!=stmts.end(); sit++){
            Statement* statement = (*sit);
-           LocationSet used;
-           statement->addUsedLocs(used);
-           LocationSet::iterator lit;
-           Exp* prevExp = NULL;
-           for (lit = used.begin(); lit != used.end(); lit++){
-               Exp *exp =(Exp*) (*lit);
-               std::cout<<"STATEMENT: "<<statement->prints()<<endl;
-               std::cout<<"EXP: "<<exp->prints()<<endl;
-//               if (prevExp)
-//                std::cout<<"PREV EXP: "<<prevExp->prints()<<endl;
-               if (exp->isRegOf() && prevExp){
-                   //std::cout<<"STATEMENT: "<<statement->prints()<<endl;
-                   char * bitVar = statement->getProc()->getRegName(exp);
+           if (statement->isBitUse && string(statement->bitName).find("specbits") == string::npos){
+
+                   char * bitVar = statement->bitName;
                    char * byteVar = findByteVar(bitVar, unionDefine, statement->getProc());
                    if (byteVar){
                        AssignSet reachIn = statement->reachIn;
@@ -1737,27 +1728,21 @@ void BasicBlock::checkUnion(list<UnionDefine*> unionDefine){
                        } else {
                            cout<<"STATEMENT: "<<statement->prints()<<std::endl;
                            cout<<"\t   RULE IS BROKEN!"<<std::endl;
+                           valid = false;
                        }
-                       Assign* temp = new Assign(exp, new Const(bitVar));
-                       bool convert;
-                       statement->replaceRef(prevExp, temp, convert);
-                       Assign* temp2 = new Assign(prevExp, new Const("bits"));
-                       statement->replaceRef(exp, temp2, convert);
+                   } else {
+                       cout<<"STATEMENT: "<<statement->prints()<<std::endl;
+                       cout<<"\t RULE IS BROKEN!"<<std::endl;
+                       valid = false;
                    }
                }
-               if (exp->isRegOf()){
-                   std::cout<<"abc: "<<statement->getProc()->getRegName(exp)<<endl;
-               }
-               if(exp->isRegOf() && string(statement->getProc()->getRegName(exp)).find("bits")!=string::npos)
-                {
-                   prevExp = exp;
-                   std::cout<<"bits";
-               }
+
            }
 
         }
-    }
+
     std::cout<<"==================================="<<std::endl;
+    return valid;
 }
 
 bool BasicBlock::makeUnion(std::list<UnionDefine*>& unionDefine, std::map<char*, AssemblyArgument*> replacement, std::map<char*, int> bitVar2)

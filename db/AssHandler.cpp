@@ -95,7 +95,7 @@ Arg findReplacement(char * name){
 //    }
 //}
 void include_bitVar(AssemblyProgram* &ass_program){
-    ass_program->bitVar = *bitVar;
+    ass_program->bitVar = *bitVar1;
 }
 
 void init_defined(){
@@ -480,7 +480,8 @@ AssemblyProgram* AssHandler::process(const char* name) {
     include_bitVar(ass_program);
 
     ass_program->replacement = replace;
-    ass_program->bitVar = *bitVar;
+    ass_program->bitVar = *bitVar1;
+    ass_program->unionDefine = unionDefine1;
 	list<AssemblyLabel*>::iterator lbi;
 	if (ass_program){
 		for(lbi = ass_program->labelList->begin();lbi != ass_program->labelList->end(); lbi++){

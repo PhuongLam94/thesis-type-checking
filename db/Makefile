@@ -17,7 +17,7 @@
 # 04 Jul 02 - Mike: Added type.cpp, TypeType.cpp
 # 01 Jul 05 - Mike: Big merge from boomerang.pole branch
 
-top_srcdir = ..
+top_srcdir = /home/phuong/type-checking
 
 # HOST_GNU_LD is true if the linker on this host machine is GNU
 HOST_GNU_LD = yes

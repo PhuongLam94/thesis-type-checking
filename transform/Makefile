@@ -7,7 +7,7 @@
 # $Revision: 1.5 $
 # 18 Apr 04 - Trent: Created.
 
-top_srcdir = ..
+top_srcdir = /home/phuong/type-checking
 
 LIB_OBJS = transform.o
 LIB=$(top_srcdir)/lib/transform.so

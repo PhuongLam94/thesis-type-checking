@@ -11,7 +11,7 @@
 # 11 Apr 02 - Mike: target is now ../lib/libutil so can use -lutil
 # 28 Apr 02 - Mike: Make library from .o not .cpp
 
-top_srcdir = ..
+top_srcdir = /home/phuong/type-checking
 
 LIB_OBJS = util.o
 LIB=$(top_srcdir)/lib/libutil.so

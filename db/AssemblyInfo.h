@@ -137,7 +137,7 @@ public:
     std::string name;
     std::list<AssemblyLabel*> *labelList;
     std::list<char*> bitReg;
-    //std::list<UnionDefine*>* unionDefine= new std::list<UnionDefine*>();
+    std::list<UnionDefine*>* unionDefine= new std::list<UnionDefine*>();
     std::map<char*, AssemblyArgument*> replacement;
     std::map<char*, int> bitVar;
 public:
