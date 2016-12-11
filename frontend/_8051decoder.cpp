@@ -138,6 +138,7 @@ unsigned map_sfr(std::string name, std::map<string, int>* symbolTable, int byteV
                 break;
             }
         }
+
         if (isDefined || name.find("specbits") != string::npos ){
         if (symbolTable->find(name) == symbolTable->end()){
             bool existed = false;
@@ -169,7 +170,7 @@ unsigned map_sfr(std::string name, std::map<string, int>* symbolTable, int byteV
         }
         }
         else {
-
+            std::cout<<"REPLACEMENT SIZE: "<<replacement.size()<<endl;
             std::cout<<"ERROR: "<<name<<" HAS NOT BEEN DEFINED YET"<<endl;
            exit(1);
         }
@@ -644,16 +645,6 @@ DecodeResult& _8051Decoder::decodeAssembly(ADDRESS pc,std::string line, Assembly
                                             exp2 = Location::memOf(temp);
                                         }
                                         stmts = instantiate(pc, "MOV_EXP", exp1, exp2);
-                                        Exp* left = Location::regOf(8);
-                                        Exp* right = Location::memOf(new Binary(opMemberAccess,Location::regOf(map_sfr(arg2->value.c, &symbolTable)), new Const("byte")));
-                                        Unary* temp1 = (Unary*) left;
-                                        Unary* temp2 = (Unary*) exp1;
-                                        bool result1 = *temp1 == *temp2;
-                                        std::cout<<"COMPARE1: "<<result1<<std::endl;
-                                        Unary* temp3 = (Unary*) right;
-                                        Unary* temp4 = (Unary*) exp2;
-                                        bool result2 = *temp3 == *temp4;
-                                        std::cout<<"COMPARE2: "<<result2<<std::endl;
                                         break;
                                     }
                                     case 4: /* A, IMM */
@@ -677,8 +668,21 @@ DecodeResult& _8051Decoder::decodeAssembly(ADDRESS pc,std::string line, Assembly
                                 exp2 = binary_expr((*ei), &symbolTable);
                                 stmts = instantiate(pc,"MOV_DPTR_ADDR16", exp1, exp2);
                             }
-                            else
-                                stmts = instantiate(pc,"MOV_DPTR_ADDR16", exp1, new Const(arg2->value.i));
+                            else{
+                                int num = arg2->value.i;
+                                std::cout<<"ARG CHAR: "<<arg2->value.c<<", "<<arg2->kind<<endl;
+                                if (arg2->kind == IMMEDIATE_ID){
+                                    std::map<char*, AssemblyArgument*>::iterator mit;
+                                    for (mit = replacement.begin(); mit!=replacement.end(); mit++){
+                                        if (strcmp((*mit).first, arg2->value.c) == 0){
+                                            num = (*mit).second->value.i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                std::cout<<"NUM: "<<num<<endl;
+                                stmts = instantiate(pc,"MOV_DPTR_ADDR16", exp1, new Const(num));
+                            }
                         }
                         else if ((op1 >= 9 && op1 <= 10) || op1 >= 12){ /* MOV DIRECT */
                             Exp * new_exp1 = Location::memOf(exp1);

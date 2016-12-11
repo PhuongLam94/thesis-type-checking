@@ -1405,18 +1405,18 @@ bool Prog::unionCheck(){
 
         //(*it2)->prints();
         UnionDefine* ud = (*it2);
-        bool existByte = false;
-        for (mit = replacement.begin(); mit!= replacement.end(); mit++){
+//        bool existByte = false;
+//        for (mit = replacement.begin(); mit!= replacement.end(); mit++){
 
-            if (ud->byteVarValue == ((AssemblyArgument*) (*mit).second)->value.i){
-                ud->byteVar = (*mit).first;
-                existByte = true;
-            }
-        }
-        if (!existByte){
-            ud->byteVar = strdup(string("LOCATION_"+to_string(ud->byteVarValue)).c_str());
-            std::cout<<"UD BYTE VAR: "<<ud->byteVar<<endl;
-        }
+//            if (ud->byteVarValue == ((AssemblyArgument*) (*mit).second)->value.i){
+//                ud->byteVar = (*mit).first;
+//                existByte = true;
+//            }
+//        }
+//        if (!existByte){
+//            ud->byteVar = strdup(string("LOCATION_"+to_string(ud->byteVarValue)).c_str());
+//            std::cout<<"UD BYTE VAR: "<<ud->byteVar<<endl;
+//        }
         ud->prints();
         UnionType * ut_temp = new UnionType();
         ut_temp->addType(new SizeType(8), "byte");

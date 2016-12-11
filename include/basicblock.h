@@ -135,7 +135,8 @@ class BasicBlock {
 		friend class Cfg;
 
 public:
-                void replaceAcc(std::list<UnionDefine*> unionDefine, std::map<Exp*, ConstantVariable*> m);
+                void replaceAcc(std::list<UnionDefine*> unionDefine, std::map<Exp*, ConstantVariable*> m, std::map<char*, AssemblyArgument*> replacement);
+
 		/*
 		 * Constructor.
 		 */
@@ -399,7 +400,7 @@ protected:
 /* Liveness */
 		LocationSet	liveIn;			// Set of locations live at BB start
                 AssignSet       reachOut;
-
+                char*           findRegValue(Exp* reg, bool isAcc, AssignSet reachIn, std::map<char*, AssemblyArgument*> replacement);
 public:
 
 		bool		isPostCall();
@@ -530,7 +531,7 @@ public:
 		void		getLiveOut(LocationSet& live, LocationSet& phiLocs);
 
                 bool            calcReachingDef();
-                bool            checkUnion(std::list<UnionDefine*> unionDefine);
+                bool            checkUnion(std::list<UnionDefine*> unionDefine, std::map<char*, AssemblyArgument*> replacement);
                 bool            makeUnion(std::list<UnionDefine*>& unionDefine, std::map<char*, AssemblyArgument*> replacement, std::map<char*, int> bitVar2);
                 bool            makeUnion(std::list<UnionDefine*>& unionDefine, char* bitVar, char* byteVar, std::map<char*, int> bitVar2, bool reCall=false);
                 bool            makeUnion_new(std::list<UnionDefine*>& unionDefine, std::map<char*, AssemblyArgument*> replacement, std::map<char*, int> bitVar2, std::map<Exp*, ConstantVariable*> mapExp);

@@ -601,10 +601,10 @@ static const short yyrhs[] = {    27,
 #if (YY_parse_DEBUG != 0) || defined(YY_parse_ERROR_VERBOSE) 
 static const short yyrline[] = { 0,
     85,    87,    89,    95,    97,    99,    99,   101,   103,   121,
-   132,   140,   142,   144,   151,   158,   160,   162,   164,   166,
-   169,   176,   184,   186,   188,   192,   193,   199,   203,   208,
-   213,   218,   223,   227,   229,   240,   242,   243,   244,   246,
-   254
+   132,   155,   157,   159,   166,   173,   175,   177,   179,   181,
+   184,   191,   199,   201,   203,   207,   208,   214,   218,   223,
+   228,   233,   238,   242,   244,   255,   257,   258,   259,   261,
+   269
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","BEGINDEFINE",
@@ -1220,9 +1220,9 @@ case 9:
 case 10:
 #line 123 "AssParser.y"
 {
+	defines->push_back(yyvsp[-12].line);
 	UnionDefine* ut = new UnionDefine();
- 	yyvsp[-12].line -> expList -> pop_back();
-	ut->byteVar = yyvsp[-12].line -> expList -> back() -> argList.back()->value.c;
+	ut->byteVar = yyvsp[-12].line -> expList -> front() -> argList.back()->value.c;
 	ut->bitVar = bitVar;
 	unionDefine1 -> push_back(ut);
 	bitVar = new map<int, char*>();
@@ -1236,10 +1236,25 @@ case 11:
 	int num = c - '0';
 	(*bitVar)[num] = yyvsp[-2].sval;
 	(*bitVar1)[yyvsp[-2].sval] = num;
+	AssemblyLine* line = new AssemblyLine();
+	line -> expList = new list<AssemblyExpression*>();
+	line->kind = INSTRUCTION;
+	line->name = "DEFINE";
+	AssemblyExpression* expr1 = new AssemblyExpression();
+	expr1 -> kind = UNARY;
+	Arg a;
+	a.c=yyvsp[-2].sval;
+	expr1 -> argList.push_back(new AssemblyArgument(6, a));
+	line -> expList->push_back(expr1);
+	AssemblyExpression* expr2 = new AssemblyExpression();
+	expr2 -> kind = UNARY;
+	expr2 -> argList.push_back(yyvsp[-1].arg);
+	line->expList ->push_back(expr2);//*/
+	defines->push_back(line);
 ;
     break;}
 case 14:
-#line 145 "AssParser.y"
+#line 160 "AssParser.y"
 { std::cout << "Label " << yyvsp[-3].sval << std::endl;
 										AssemblyLabel* label = new AssemblyLabel();
 										label->name = yyvsp[-3].sval;
@@ -1248,7 +1263,7 @@ case 14:
 										gl_lines = new list<AssemblyLine*>();;
     break;}
 case 15:
-#line 151 "AssParser.y"
+#line 166 "AssParser.y"
 { std::cout << "Label " << yyvsp[-2].sval << std::endl;
 										AssemblyLabel* label = new AssemblyLabel();
 										label->name = yyvsp[-2].sval;
@@ -1257,7 +1272,7 @@ case 15:
 										gl_lines = new list<AssemblyLine*>();;
     break;}
 case 21:
-#line 170 "AssParser.y"
+#line 185 "AssParser.y"
 {   AssemblyLine* line = new AssemblyLine();
 				line->kind = INSTRUCTION;
 				line->name = yyvsp[0].sval;
@@ -1266,7 +1281,7 @@ case 21:
 			    gl_exps = new list<AssemblyExpression*>();;
     break;}
 case 22:
-#line 176 "AssParser.y"
+#line 191 "AssParser.y"
 { AssemblyLine* line = new AssemblyLine();
 				line->kind = INSTRUCTION;
 				line->name = yyvsp[-1].sval;
@@ -1276,12 +1291,12 @@ case 22:
 				;
     break;}
 case 25:
-#line 189 "AssParser.y"
+#line 204 "AssParser.y"
 {gl_exps->push_back(expr);
 				expr = new AssemblyExpression();;
     break;}
 case 27:
-#line 193 "AssParser.y"
+#line 208 "AssParser.y"
 {	
 				std::cout << "String " << yyvsp[0].sval << std::endl;
 				Arg a;
@@ -1290,14 +1305,14 @@ case 27:
 				;
     break;}
 case 28:
-#line 199 "AssParser.y"
+#line 214 "AssParser.y"
 {std::cout << "FLOAT " << yyvsp[0].fval << std::endl;
 				Arg a;
 				a.f = yyvsp[0].fval;
 				yyval.arg = new AssemblyArgument(2,a);;
     break;}
 case 29:
-#line 203 "AssParser.y"
+#line 218 "AssParser.y"
 {std::cout << "Immediate Value " << yyvsp[0].ival << std::endl;
 						Arg a;
 						a.i = yyvsp[0].ival;
@@ -1305,7 +1320,7 @@ case 29:
 						;
     break;}
 case 30:
-#line 208 "AssParser.y"
+#line 223 "AssParser.y"
 {std::cout << "Immediate Value " << yyvsp[0].sval << std::endl;
 				Arg a;
 				a.c = yyvsp[0].sval;
@@ -1313,7 +1328,7 @@ case 30:
 			   ;
     break;}
 case 31:
-#line 213 "AssParser.y"
+#line 228 "AssParser.y"
 {std::cout << "Direct Value " << yyvsp[0].ival << std::endl;
 					Arg a;
 					a.i = yyvsp[0].ival;
@@ -1321,7 +1336,7 @@ case 31:
 					;
     break;}
 case 32:
-#line 218 "AssParser.y"
+#line 233 "AssParser.y"
 {std::cout << "Indirect value " << yyvsp[0].sval << std::endl;
 					Arg a;
 					a.c = yyvsp[0].sval;
@@ -1329,18 +1344,18 @@ case 32:
 					;
     break;}
 case 33:
-#line 223 "AssParser.y"
+#line 238 "AssParser.y"
 {std::cout << "ID " << yyvsp[0].sval << std::endl;
 					Arg a;
 					a.c = yyvsp[0].sval;
 					yyval.arg = new AssemblyArgument(6,a);;
     break;}
 case 34:
-#line 227 "AssParser.y"
+#line 242 "AssParser.y"
 {yyval.arg=yyvsp[0].arg;;
     break;}
 case 35:
-#line 229 "AssParser.y"
+#line 244 "AssParser.y"
 { std::cout << "BIT" << std::endl;
 					std::stringstream ss;
   					ss << yyvsp[-2].sval << '.' << yyvsp[0].ival;
@@ -1353,23 +1368,23 @@ case 35:
 					yyval.arg = new AssemblyArgument(8,a);;
     break;}
 case 36:
-#line 241 "AssParser.y"
+#line 256 "AssParser.y"
 {yyval.ival = yyvsp[0].ival;;
     break;}
 case 37:
-#line 242 "AssParser.y"
+#line 257 "AssParser.y"
 {yyval.ival = yyvsp[0].ival;;
     break;}
 case 38:
-#line 243 "AssParser.y"
+#line 258 "AssParser.y"
 {yyval.ival = yyvsp[0].ival;;
     break;}
 case 39:
-#line 244 "AssParser.y"
+#line 259 "AssParser.y"
 {yyval.ival = yyvsp[0].ival;;
     break;}
 case 40:
-#line 247 "AssParser.y"
+#line 262 "AssParser.y"
 { 
 	 								Arg a;
 	 								a.c = yyvsp[-1].sval;
@@ -1379,7 +1394,7 @@ case 40:
 	 								expr->argList.push_back(yyvsp[0].arg);;
     break;}
 case 41:
-#line 254 "AssParser.y"
+#line 269 "AssParser.y"
 { expr->argList.push_back(yyvsp[0].arg);;
     break;}
 }
@@ -1586,7 +1601,7 @@ YYLABEL(yyerrhandle)
 /* END */
 
  #line 1038 "/usr/share/bison++/bison.cc"
-#line 257 "AssParser.y"
+#line 272 "AssParser.y"
 
 
 

@@ -1348,7 +1348,7 @@ bool UserProc::unionCheck(std::list<UnionDefine*>& unionDefine, std::map<Exp*, C
                 // Look at each call, to do the DFS
                 for (PBB bb = cfg->getFirstBB(it); bb; bb = cfg->getNextBB(it)) {
                     bb->calcReachingDef();
-                    if(!bb->checkUnion(unionDefine)){
+                    if(!bb->checkUnion(unionDefine, replacement)){
                         valid = false;
                     }
                    status = PROC_FINAL;
@@ -1380,7 +1380,7 @@ void UserProc::replaceAcc(std::list<UnionDefine*>& unionDefine, std::map<Exp*, C
                     //bb->checkUnion(unionDefine);
                     //unionDefine.clear();
 
-                   bb->replaceAcc(unionDefine, mapExp);
+                   bb->replaceAcc(unionDefine, mapExp, replacement);
                        //cout<<"proc check union is false"<<endl;
                    status = PROC_FINAL;
                 }
@@ -1832,12 +1832,12 @@ void UserProc::remUnusedStmtEtc(std::map<Exp*, ConstantVariable*>&map, std::list
 //        exit(1);
 //    }
 	// Now remove any that have no used
-	if (!Boomerang::get()->noRemoveNull)
-		remUnusedStmtEtc(refCounts);
+    if (!Boomerang::get()->noRemoveNull)
+        remUnusedStmtEtc(refCounts);
 
-	// Remove null statements
-	if (!Boomerang::get()->noRemoveNull)
-		removeNullStatements();
+    // Remove null statements
+    if (!Boomerang::get()->noRemoveNull)
+        removeNullStatements();
 
 	printXML();
 	if (VERBOSE && !Boomerang::get()->noRemoveNull) {
