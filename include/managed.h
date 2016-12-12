@@ -105,6 +105,7 @@ typedef std::set<Assign*, lessAssign>::const_iterator const_iterator;
                 bool		exists(Assign* s);						// Search; returns false if !found
 		bool		definesLoc(Exp* loc);					// Search; returns true if any assignment defines loc
 		Assign*		lookupLoc(Exp* loc);					// Search for loc on LHS, return ptr to Assign if found
+                Assign*		findDef(Exp* loc);
 
 		void		clear() {aset.clear();}					// Clear the set
 		bool		operator==(const AssignSet& o) const	// Compare if equal

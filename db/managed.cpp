@@ -239,10 +239,20 @@ bool AssignSet::definesLoc(Exp* loc) {
 
 // Find a definition for loc on the LHS in this Assign set. If found, return pointer to the Assign with that LHS
 Assign* AssignSet::lookupLoc(Exp* loc) {
+
 	Assign* as = new Assign(loc, new Terminal(opWild));
 	iterator ff = aset.find(as);
 	if (ff == aset.end()) return NULL;
 	return *ff;
+}
+Assign* AssignSet::findDef(Exp* loc){
+    iterator ff;
+    for (ff = begin(); ff != end(); ff++){
+        if (*(*ff)->getLeft() == *loc){
+            return (*ff);
+        }
+    }
+    return NULL;
 }
 
 // Print to a string, for debugging

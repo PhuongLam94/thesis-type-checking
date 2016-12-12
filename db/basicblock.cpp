@@ -1748,7 +1748,7 @@ bool BasicBlock::checkUnion(list<UnionDefine*> unionDefine, std::map<char*, Asse
     return valid;
 }
 char*           BasicBlock::findRegValue(Exp* reg, bool isAcc, AssignSet reachIn, std::map<char*, AssemblyArgument*> replacement){
-    Assign* def = reachIn.lookupLoc(reg);
+    Assign* def = reachIn.findDef(reg);
     if (def){
         Exp* rhs;
         if (isAcc){
@@ -1775,7 +1775,6 @@ char*           BasicBlock::findRegValue(Exp* reg, bool isAcc, AssignSet reachIn
                     return findRegValue(Location::local(local, NULL), false, reachIn, replacement);
             } else if (rhs->isTypedExp() && rhs->getSubExp1()->isIntConst()){
                 int num = ((Const*) rhs->getSubExp1())->getInt();
-                std::cout<<"NUM: "<<num<<endl;
                 std::map<char*, AssemblyArgument*>::iterator mit;
                 char* var = NULL;
                 for (mit = replacement.begin(); mit!=replacement.end(); mit++){
@@ -1797,7 +1796,6 @@ char*           BasicBlock::findRegValue(Exp* reg, bool isAcc, AssignSet reachIn
         }
     //return ((Const*)def->getRight()->getSubExp1()->getSubExp1())->getChar();
     } else{
-        std::cout<<"DEF is null"<<endl;
         return NULL;
     }
 }
@@ -1950,11 +1948,9 @@ void BasicBlock::replaceAcc(std::list<UnionDefine *> unionDefine, std::map<Exp *
         std::list<Statement*>::iterator sit;
         for (sit = stmts.begin(); sit!=stmts.end(); sit++){
            Statement* statement = (*sit);
-           std::cout<<"Statement: "<<statement->prints()<<", "<<statement->isBitUse<<endl;
            AssignSet reachIn = statement->reachIn;
-           std::cout<<"ReachIn: "<<statement->reachIn.prints()<<endl;
            char* aValue = findRegValue(Location::local("a", statement->getProc()), true, statement->reachIn, replacement);
-           std::cout<<"aValue: "<<(aValue?aValue:"NULL")<<endl;
+
             if (statement->isBitUse){
               char* byteVar;
                char* bitName;
@@ -1997,9 +1993,9 @@ void BasicBlock::replaceAcc(std::list<UnionDefine *> unionDefine, std::map<Exp *
                Assign* def = statement->reachOut.lookupLoc(a);
                if (statement == def){
                    statement->getProc()->removeStatement(statement);
-                   std::cout<<"Statement1: "<<statement->prints()<<", "<<statement->isBitUse<<endl;
+                   //std::cout<<"Statement1: "<<statement->prints()<<", "<<statement->isBitUse<<endl;
                } else if (aValue){
-                   std::cout<<"Statement2: "<<statement->prints()<<", "<<statement->isBitUse<<endl;
+                   //std::cout<<"Statement2: "<<statement->prints()<<", "<<statement->isBitUse<<endl;
                        Assign* assign = new Assign(Location::local("a", statement->getProc()), new Binary(opMemberAccess,
                                                      Location::global(aValue, statement->getProc()), new Const("byte")));
                        statement->replaceRef(Location::local("a", statement->getProc()), assign, convert);

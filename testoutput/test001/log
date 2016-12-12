@@ -7,10 +7,8 @@ in cluster elf-init
 parameters: i32 argc, [c*]* argv, [c*]* envp
 end parameters
 locals:
-__size8 a r8
 end locals
 symbols:
-  r8 maps to a type __size8
   r32{0} maps to argc type int
   r33{0} maps to argv type char *[] *
   r34{0} maps to envp type char *[] *
@@ -24,10 +22,12 @@ out edges:
 00010474
 00010478
 0001047c    4 *8* OPTIONS.bits.TESTSUPS1 := 1
-00010480    5 RET *8* a := a
+00010480    5 RET *8* OPTIONS.byte := OPTIONS.byte
               Modifieds: *8* a,  *16* r11,  *32* TESTSUPS1
-              Reaching definitions: a=a,   r11=10,   r32=argc,   r33=argv,   r34=envp,   TESTSUPS1=1,   tmp1=10
+              Reaching definitions: OPTIONS.byte=OPTIONS.byte,   r11=10,   r32=argc,   r33=argv,   r34=envp,
+                TESTSUPS1=1,   tmp1=10
 
 
 type failure: no type for subexp1 of OPTIONS.bits.TESTSUPS1
 type failure: no type for subexp1 of OPTIONS.bits
+type failure: no type for subexp1 of OPTIONS.byte
