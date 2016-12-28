@@ -660,6 +660,7 @@ bool FrontEnd::processProc(ADDRESS uAddr, UserProc* pProc, std::ofstream &os, bo
 			
 			if(ASS_FILE){
 				if(li != temp_lines->end()){
+                    std::cout<<"Assembly line: "<<endl;
 					inst = decodeAssemblyInstruction(uAddr,"assemblySets.at(line)", (*li));
 				}
 			}

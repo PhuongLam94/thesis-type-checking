@@ -1356,8 +1356,9 @@ bool UserProc::unionCheck(std::list<UnionDefine*>& unionDefine, std::map<Exp*, C
                 return valid;
 
 }
-void UserProc::replaceAcc(std::list<UnionDefine*>& unionDefine, std::map<Exp*, ConstantVariable*> mapExp) {
+bool UserProc::replaceAcc(std::list<UnionDefine*>& unionDefine, std::map<Exp*, ConstantVariable*> mapExp) {
         //std::cout<<"UNION CHECK OF PROC IS CALLED"<<endl;
+        bool valid = true;
         if (VERBOSE)
                 LOG << "begin decompile(" << getName() << ")\n";
 
@@ -1380,10 +1381,13 @@ void UserProc::replaceAcc(std::list<UnionDefine*>& unionDefine, std::map<Exp*, C
                     //bb->checkUnion(unionDefine);
                     //unionDefine.clear();
 
-                   bb->replaceAcc(unionDefine, mapExp, replacement);
+                   if(!bb->replaceAcc(unionDefine, mapExp, replacement)){
+                        valid = false;
+                   }
                        //cout<<"proc check union is false"<<endl;
                    status = PROC_FINAL;
                 }
+                return valid;
 
 }
 
@@ -1891,15 +1895,14 @@ void UserProc::checkAccAssign(){
     StatementList::iterator it;
     StatementList stmts;
     getStatements(stmts);
+    Statement* accAssign;
     for (it = stmts.begin(); it!= stmts.end(); it++){
         Statement* s = (*it);
-        std::cout<<"ISACCASSIGN: "<<s->prints()<<endl;
+        s->accAssign = *accAssign;
         bool isAssignAcc = false;
         if (s->isAssign()){
            Assign* assign = (Assign*) s;
-            if (assign->getRight()->isMemOf()&&
-                    assign->getRight()->getSubExp1()->isSubscript() &&
-                    assign->getRight()->getSubExp1()->getSubExp1()->isRegOf()
+            if (true
                     )
             {
                 bool isA = false;
@@ -1910,19 +1913,12 @@ void UserProc::checkAccAssign(){
                     isA = ((Const*)assign->getLeft()->getSubExp1()->getSubExp1())->getInt() == 8;
                 }
 
-                if (isA){
-                 Exp* rhs = (Exp*) assign->getRight()->getSubExp1()->getSubExp1();
-                        char* byteVar = getRegName(rhs);
-                        isAssignAcc = true;
-                        s->setByteAssign(byteVar);
-                        s->setAccAssign(isAssignAcc);
-                        std::cout<<"ISASSIGN: "<<isAssignAcc<<endl;
-                    }
-
+               isAssignAcc = isA;
             }
         }
         s->setAccAssign(isAssignAcc);
-
+        if (isAssignAcc)
+            accAssign = s;
     }
 }
 
@@ -1989,7 +1985,7 @@ void UserProc::remUnusedStmtEtc(RefCounter& refCounts) {
 				}
 				if (DEBUG_UNUSED)
 					LOG << "removing unused statement " << s->getNumber() << " " << s << "\n";
-                if (!(s->isBitUse)){
+                if (!(s->isBitUse) && !(s->getAccAssign())){
                 removeStatement(s);
 				ll = stmts.erase(ll);	// So we don't try to re-remove it
                 change = true;

@@ -141,14 +141,15 @@ protected:
 #if		USE_DOMINANCE_NUMS
 		int			dominanceNum;	// Like a statement number, but has dominance properties
 public:
-                bool isBitUse = false;
+                 bool isBitUse = false;
                 char* bitName = NULL;
 		int			getDomNumber() {return dominanceNum;}
 		void		setDomNumber(int dn) {dominanceNum = dn;}
-                AssignSet           reachIn;
-                AssignSet           reachOut;
+                ReachingDefList           reachIn;
+                ReachingDefList           reachOut;
                 std::map<Exp*, ConstantVariable*> constantIn; //to store constant value of a variable coming to the statement
                 std::map<Exp*, ConstantVariable*> constantOut; //to store constant value of a variable coming out of the statement
+                Statement accAssign;
 
 protected:
 #endif

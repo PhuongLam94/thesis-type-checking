@@ -41,6 +41,19 @@ class RefExp;
 class Cfg;
 class LocationSet;
 
+class ReachingDefList{
+    std::list<Assign*> aList;
+public:
+    void removeIfDefines(Exp* exp);
+    void insert(Assign* assign);
+    void clear();
+    void makeUnion(ReachingDefList& other);
+    std::list<Assign*> getAList(){return aList;}
+    std::list<Assign*> findDef(Exp* exp);
+    char* prints();
+    bool operator==(ReachingDefList& other);
+};
+
 // A class to implement sets of statements
 class StatementSet {
 		std::set<Statement*> sset;							// For now, use use standard sets

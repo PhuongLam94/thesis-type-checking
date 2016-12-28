@@ -1395,6 +1395,7 @@ bool Prog::unionCheck(){
             }
     }
     if (valid){
+         bool validReplaceAcc = true;
     std::map<char*, AssemblyArgument*> replacement = ((UserProc*) (*entryProcs.begin()))->replacement;
     std::map<char*, AssemblyArgument*>::iterator mit;
     list<UnionDefine*>::iterator it2;
@@ -1445,7 +1446,8 @@ bool Prog::unionCheck(){
             if (VERBOSE)
                     LOG << "decompiling entry point " << (*ee)->getName() << "\n";
             int indent = 0;
-            (*ee)->replaceAcc(unionDefine, map);
+            if (!(*ee)->replaceAcc(unionDefine, map))
+                validReplaceAcc = false;
 
     }
 
@@ -1460,12 +1462,14 @@ bool Prog::unionCheck(){
                             if (proc->isLib()) continue;
                             if (proc->isDecompiled()) continue;
                             int indent = 0;
-                            proc->replaceAcc(unionDefine, map);
+                            if (!proc->replaceAcc(unionDefine, map))
+                                validReplaceAcc = false;
                             foundone = true;
                     }
             }
     }
-    return true;
+
+    return validReplaceAcc;
     } else {
         return false;
     }

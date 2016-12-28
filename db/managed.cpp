@@ -47,7 +47,77 @@ std::ostream& operator<<(std::ostream& os, LocationSet* ls) {
 	ls->print(os);
 	return os;
 }
+//ReachingDefList method
+void ReachingDefList::clear(){
+    aList.clear();
+}
+void ReachingDefList::insert(Assign* assign){
+    aList.push_back(assign);
+}
+void ReachingDefList::removeIfDefines(Exp *exp){
+    std::list<Assign*>::iterator it;
+    for (it = aList.begin(); it!=aList.end(); it++){
+        if (*(*it)->getLeft() == *exp){
+            aList.remove((*it));
+        }
+    }
+}
+void ReachingDefList::makeUnion(ReachingDefList &other){
+    std::list<Assign*>::iterator it;
+    std::list<Assign*>::iterator it2;
+    std::list<Assign*> otherAList = other.getAList();
+    for (it = otherAList.begin(); it!=otherAList.end(); it++){
+        bool exist = false;
+        for (it2 = aList.begin(); it2!=aList.end(); it2++){
+            if ((*it) == (*it2)){
+                exist = true;
+                break;
+            }
+        }
+        if (!exist){
+            aList.push_back((*it));
+        }
+    }
+}
+std::list<Assign*> ReachingDefList::findDef(Exp *exp){
+    std::list<Assign*>::iterator it;
+    std::list<Assign*> returnList;
+    for (it = aList.begin(); it!=aList.end(); it++){
+        if (*((*it)->getLeft()) == *exp){
+            returnList.push_back((*it));
+        }
+    }
+    return returnList;
+}
+char* ReachingDefList::prints(){
+    std::ostringstream ost;
+    std::list<Assign*>::iterator it;
+    for (it = aList.begin(); it!=aList.end(); it++){
+        if (it != aList.begin()) ost << ",\t";
+        ost << *it;
+    }
+    ost << "\n";
+    strncpy(debug_buffer, ost.str().c_str(), DEBUG_BUFSIZE-1);
+    debug_buffer[DEBUG_BUFSIZE-1] = '\0';
+    return debug_buffer;
+}
+bool ReachingDefList::operator ==(ReachingDefList& other){
+        if (aList.size() != other.getAList().size()) return false;
+        std::list<Assign*>::iterator it1, it2;
+        for (it1 = aList.begin(); it1!= aList.end(); it1++){
+            bool exist = false;
+            for (it2 = other.getAList().begin(); it2!= other.getAList().end(); it2++){
+                if (*it1 == *it2){
+                    exist = true;
+                    break;
+                }
+            }
+            if (!exist)
+                return false;
+        }
+        return true;
 
+}
 
 //
 // StatementSet methods
@@ -178,6 +248,8 @@ bool StatementSet::operator<(const StatementSet& o) const {
 void AssignSet::makeUnion(AssignSet& other) {
 	iterator it;
 	for (it = other.aset.begin(); it != other.aset.end(); it++) {
+        Assign* assign = (*it);
+        std::cout<<"Assign set: "<<assign->prints()<<std::endl;
 		aset.insert(*it);
 	}
 }

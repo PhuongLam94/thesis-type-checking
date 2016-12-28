@@ -135,7 +135,7 @@ class BasicBlock {
 		friend class Cfg;
 
 public:
-                void replaceAcc(std::list<UnionDefine*> unionDefine, std::map<Exp*, ConstantVariable*> m, std::map<char*, AssemblyArgument*> replacement);
+                bool replaceAcc(std::list<UnionDefine*> unionDefine, std::map<Exp*, ConstantVariable*> m, std::map<char*, AssemblyArgument*> replacement);
 
 		/*
 		 * Constructor.
@@ -399,8 +399,8 @@ protected:
 
 /* Liveness */
 		LocationSet	liveIn;			// Set of locations live at BB start
-                AssignSet       reachOut;
-                char*           findRegValue(Exp* reg, bool isAcc, AssignSet reachIn, std::map<char*, AssemblyArgument*> replacement);
+                ReachingDefList       reachOut;
+                char*           findRegValue(Exp* reg, bool isAcc, ReachingDefList reachIn, std::map<char*, AssemblyArgument*> replacement);
 public:
 
 		bool		isPostCall();
@@ -540,7 +540,7 @@ public:
                 int findByteVarValue(char* bitVar, std::list<UnionDefine*> unionDefine, UserProc* proc=NULL);
 
                 int findBitNum(char* bitVar, std::map<char*, int> mapBit);
-                void            getReachIn(AssignSet& reach);
+                void            getReachIn(ReachingDefList& reach);
 		// Find indirect jumps and calls
 		bool		decodeIndirectJmp(UserProc* proc);
 		void		processSwitch(UserProc* proc);

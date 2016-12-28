@@ -1,10 +1,17 @@
-bb
+AA
 		MOV
-					 DPTR 
-					 OPTIONS 
-		MOVX
 					 A 
-					 DPTR 
+					 OPTIONS 
+		JB
+					 TESTSUPS 
+					 BB 
+		MOV
+					 A 
+					 OPTIONS2 
 		SETB
-					 TESTSUPS1 
+					 A 
 		RET
+BB
+		MOV
+					 A 
+					 OPTIONS2 
