@@ -136,6 +136,7 @@ class BasicBlock {
 
 public:
                 bool replaceAcc(std::list<UnionDefine*> unionDefine, std::map<Exp*, ConstantVariable*> m, std::map<char*, AssemblyArgument*> replacement);
+                bool replaceAcc2(std::list<UnionDefine*> unionDefine, std::map<Exp*, ConstantVariable*> m, std::map<char*, AssemblyArgument*> replacement);
 
 		/*
 		 * Constructor.
@@ -401,6 +402,7 @@ protected:
 		LocationSet	liveIn;			// Set of locations live at BB start
                 ReachingDefList       reachOut;
                 char*           findRegValue(Exp* reg, bool isAcc, ReachingDefList reachIn, std::map<char*, AssemblyArgument*> replacement);
+                char*           findRegValue(std::map<Exp*, ConstantVariable*> map, Statement* statement);
 public:
 
 		bool		isPostCall();
@@ -531,6 +533,7 @@ public:
 		void		getLiveOut(LocationSet& live, LocationSet& phiLocs);
 
                 bool            calcReachingDef();
+                bool            checkUnion(std::list<UnionDefine*> unionDefine, std::map<char*, AssemblyArgument*> replacement,std::map<Exp*, ConstantVariable*> map);
                 bool            checkUnion(std::list<UnionDefine*> unionDefine, std::map<char*, AssemblyArgument*> replacement);
                 bool            makeUnion(std::list<UnionDefine*>& unionDefine, std::map<char*, AssemblyArgument*> replacement, std::map<char*, int> bitVar2);
                 bool            makeUnion(std::list<UnionDefine*>& unionDefine, char* bitVar, char* byteVar, std::map<char*, int> bitVar2, bool reCall=false);

@@ -7,11 +7,11 @@ AA
 					 BB 
 		MOV
 					 A 
-					 OPTIONS2 
+					 OPTIONS 
 		SETB
-					 A 
+					 SIMP 
 		RET
 BB
 		MOV
 					 A 
-					 OPTIONS2 
+					 OPTIONS 

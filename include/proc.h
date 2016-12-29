@@ -604,7 +604,7 @@ private:
 		void		searchRegularLocals(OPER minusOrPlus, bool lastPass, int sp, StatementList& stmts);
                 std::map<Exp*,ConstantVariable*> constMap;
 public:
-                void            constantPropagation(std::map<Exp*, ConstantVariable*>& map); //do the constant propagation
+                void            typePropagation(std::map<Exp*, ConstantVariable*>& map); //do the type propagation
 		bool		removeNullStatements();
 		bool		removeDeadStatements();
 typedef std::map<Statement*, int> RefCounter;

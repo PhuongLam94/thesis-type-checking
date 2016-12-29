@@ -149,7 +149,7 @@ public:
                 ReachingDefList           reachOut;
                 std::map<Exp*, ConstantVariable*> constantIn; //to store constant value of a variable coming to the statement
                 std::map<Exp*, ConstantVariable*> constantOut; //to store constant value of a variable coming out of the statement
-                Statement accAssign;
+                Statement* accAssign;
 
 protected:
 #endif

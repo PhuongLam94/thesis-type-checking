@@ -72,3 +72,10 @@ public:
     ConstantVariable* visit(Ternary *c, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
     ConstantVariable* visit(RefExp *c, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
 };
+class ExpTypeVisitor{
+public:
+    ConstantVariable* visit(Const* c, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+    ConstantVariable* visit(TypedExp* c, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+    ConstantVariable* visit(Ternary *c, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+    ConstantVariable* visit(RefExp *c, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+};

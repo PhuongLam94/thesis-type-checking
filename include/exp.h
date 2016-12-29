@@ -62,6 +62,7 @@ class ConstantVariable;
 class EvalExpressionVisitor;
 class MapExpConstant;
 class AssemblyArgument;
+class ExpTypeVisitor;
 
 typedef BasicBlock* PBB;
 
@@ -100,6 +101,7 @@ virtual				~Exp() {}
 		unsigned	getLexBegin() { return lexBegin; }
 		unsigned	getLexEnd() { return lexEnd; }
                 virtual ConstantVariable* accept(EvalExpressionVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){return NULL;}
+                virtual ConstantVariable* accept(ExpTypeVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){return NULL;}
 
 		// Print the expression to the given stream
 virtual void		print(std::ostream& os, bool html = false) = 0;
@@ -393,6 +395,7 @@ class Const : public Exp {
 		Type*		type;		// Constants need types during type analysis
 public:
                 virtual ConstantVariable* accept(EvalExpressionVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+                virtual ConstantVariable* accept(ExpTypeVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
                 char* getChar(){return u.p;}
 		// Special constructors overloaded for the various constants
 					Const(int i);
@@ -694,6 +697,7 @@ virtual Exp* genConstraints(Exp* restrictTo);
 virtual bool	accept(ExpVisitor* v);
 virtual Exp*	accept(ExpModifier* v);
 virtual ConstantVariable* accept(EvalExpressionVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+virtual ConstantVariable* accept(ExpTypeVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
 
 virtual bool 		match(const char *pattern, std::map<std::string, Exp*> &bindings);
 
@@ -746,6 +750,7 @@ virtual Exp*		polySimplify(bool& bMod);
 virtual bool		accept(ExpVisitor* v);
 virtual Exp*		accept(ExpModifier* v);
 virtual ConstantVariable* accept(EvalExpressionVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+virtual ConstantVariable* accept(ExpTypeVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
 
 virtual	Type*		ascendType();
 virtual void		descendType(Type* parentType, bool& ch, Statement* s);
@@ -793,7 +798,9 @@ virtual bool 		operator==(const Exp& o) const;
 virtual bool 		operator< (const Exp& o) const;
 virtual bool		operator*=(Exp& o);
 virtual ConstantVariable* accept(EvalExpressionVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
-virtual void		print(std::ostream& os, bool html = false);
+virtual ConstantVariable* accept(ExpTypeVisitor* v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc);
+
+                                        virtual void		print(std::ostream& os, bool html = false);
 virtual void		printx(int ind);
 //virtual int		getNumRefs() {return 1;}
 		Statement*	getDef() {return def;}		// Ugh was called getRef()

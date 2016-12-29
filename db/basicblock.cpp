@@ -1703,6 +1703,117 @@ bool BasicBlock::calcLiveness(ConnectionGraph& ig, UserProc* myProc) {
 		// No change
 		return false;
 }
+char* BasicBlock::findRegValue(std::map<Exp *, ConstantVariable *> map, Statement *statement){
+    std::cout<<"Find reg value called, statement: "<<statement->prints()<<endl;
+    int aValue;
+    int subscript = -1;
+    char* bitVar = statement->bitName;
+    Exp* aDefine = NULL;
+    if (statement->accAssign){
+      std::cout<<"accAssign: "<<statement->accAssign->prints()<<endl;
+    std::map<Exp*, ConstantVariable*>::iterator mit;
+    for (mit = map.begin(); mit != map.end(); mit++){
+        Exp* exp = (*mit).first;
+        std::cout<<exp->prints()<<", "<<exp->isSubscript()<<endl;
+        if (exp->isSubscript() && (*exp->getSubExp1() == *Location::regOf(8))){
+
+            RefExp* left = (RefExp*) exp;
+            if (statement->accAssign && statement->accAssign->isAssign()){
+                std::cout<<"test"<<endl;
+                if (left->getDef()->isAssign()){
+                    Assign* temp1 = (Assign*) statement->accAssign;
+                    Assign* temp2 = (Assign*) left->getDef();
+                    if(temp1->getNumber() == temp2->getNumber()){
+                        aDefine = exp;
+                        subscript = left->getDef()->getNumber();
+                        break;
+                    }
+                }
+            } else {
+                if (left->getDef()->isPhi()){
+                    PhiAssign* temp1 = (PhiAssign*) statement->accAssign;
+                    PhiAssign* temp2 = (PhiAssign*) left->getDef();
+                    std::cout<<"compare: "<<temp1->getLeft()->prints()<<", "<<temp2->getLeft()->prints()
+                            <<", "<<(*temp1->getLeft() == *temp2->getLeft())<<endl;
+
+                    if (temp1->getNumDefs() == temp2->getNumDefs()){
+                        std::cout<<"phi assign: "<<temp1->prints()<<", "<<temp2->prints()<<endl;
+                        bool equal = true;
+                        for (int i=0; i<temp1->getNumDefs(); i++){
+                            if (temp1->getStmtAt(i)->getNumber() != temp2->getStmtAt(i)->getNumber())
+                                equal = false;
+
+                        }
+                        if (equal){
+                            aDefine = exp;
+                            subscript = left->getDef()->getNumber();
+                            break;
+
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+    }
+    if (subscript == -1){
+        std::cout<<"NULL"<<endl;
+        return NULL;
+    } else {
+        ConstantVariable* temp = map[aDefine];
+        if (temp->type == 2)
+        //std::cout<<"temp: "<<temp->variable->prints()<<endl;
+            return ((Const*)temp->variable)->getChar();
+        else
+            return NULL;
+    }
+}
+
+bool BasicBlock::checkUnion(list<UnionDefine*> unionDefine, std::map<char*, AssemblyArgument*> replacement, std::map<Exp*, ConstantVariable*> map){
+    std::cout<<"==============================="<<endl;
+    std::cout<<"UNION CHECKING AREA 111"<<endl;
+    bool valid = true;
+    std::list<RTL*>::iterator rit;
+    for (rit = m_pRtls->begin(); rit != m_pRtls->end(); rit++){
+        std::list<Statement*>& stmts = (*rit)->getList();
+        std::list<Statement*>::iterator sit;
+        for (sit = stmts.begin(); sit!=stmts.end(); sit++){
+           Statement* statement = (*sit);
+           if (statement->isBitUse && string(statement->bitName).find("specbits") == string::npos){
+                   char * bitVar = statement->bitName;
+                   char* byteVarTemp = findByteVar(bitVar, unionDefine, statement->getProc());
+                   char* byteVar = byteVarTemp == NULL? NULL:strdup(string(byteVarTemp).c_str());
+                   //std::cout<<"Byte var "<<byteVar<<endl;
+                   if (byteVar){
+                       ReachingDefList reachIn = statement->reachIn;
+                       //std::cout<<"Yes "<<reachIn.prints()<<endl;
+                       //std::cout<<"Yes"<<endl;
+                       char* aValue = findRegValue(map, statement);
+                       //std::cout<<"aValue "<<aValue<<endl;
+                       if (aValue && strcmp(aValue, byteVar) == 0){
+                           cout<<"STATEMENT: "<<statement->prints()<<std::endl;
+                           cout<<"\t   RULE IS FOLLOWED!"<<std::endl;
+                       } else {
+                           cout<<"STATEMENT: "<<statement->prints()<<std::endl;
+                           cout<<"\t   RULE IS BROKEN!"<<std::endl;
+                           valid = false;
+                       }
+                   } else {
+                       //std::cout<<"No"<<endl;
+                       cout<<"STATEMENT: "<<statement->prints()<<std::endl;
+                       cout<<"\t RULE IS BROKEN!"<<std::endl;
+                       valid = false;
+                   }
+               }
+
+           }
+
+        }
+
+    std::cout<<"==================================="<<std::endl;
+    return valid;
+}
 bool BasicBlock::checkUnion(list<UnionDefine*> unionDefine, std::map<char*, AssemblyArgument*> replacement){
     std::cout<<"==============================="<<endl;
     std::cout<<"UNION CHECKING AREA"<<endl;
@@ -1747,6 +1858,7 @@ bool BasicBlock::checkUnion(list<UnionDefine*> unionDefine, std::map<char*, Asse
     std::cout<<"==================================="<<std::endl;
     return valid;
 }
+
 char*           BasicBlock::findRegValue(Exp* reg, bool isAcc, ReachingDefList reachIn, std::map<char*, AssemblyArgument*> replacement){
     std::list<Assign*> defList = reachIn.findDef(reg);
     //std::cout<<"DEF IS NULL: "<<(def == NULL)<<endl;
@@ -1928,6 +2040,104 @@ bool BasicBlock::replaceAcc(std::list<UnionDefine *> unionDefine, std::map<Exp *
            }
         }
     }
+    std::cout<<"==========================="<<endl;
+    return valid;
+}
+bool BasicBlock::replaceAcc2(std::list<UnionDefine *> unionDefine, std::map<Exp *, ConstantVariable *> m, std::map<char*, AssemblyArgument*> replacement){
+    std::cout<<"==========================="<<endl;
+    std::cout<<"ENTER REPLACE ACC"<<endl;
+    std::set<int> numStmt;
+    std::list<RTL*>::iterator rit;
+    bool convert;
+    bool valid = true;
+    for (rit = m_pRtls->begin(); rit != m_pRtls->end(); rit++){
+        std::list<Statement*>& stmts = (*rit)->getList();
+        std::list<Statement*>::iterator sit;
+
+        for (sit = stmts.begin(); sit!=stmts.end(); sit++){
+           Statement* statement = (*sit);
+           ReachingDefList reachIn = statement->reachIn;
+           char* aValue = findRegValue(m, statement);
+
+            if (statement->isBitUse){
+              char* byteVar;
+               char* bitName;
+                if (string(statement->bitName).find("specbits") == string::npos){
+                    byteVar = strdup(string(findByteVar(statement->bitName, unionDefine, statement->getProc())).c_str());
+                    bitName = statement->bitName;
+                } else {
+                    string bitNameString = string(statement->bitName);
+                    int i = atoi(bitNameString.substr(bitNameString.length()-1,1).c_str());
+                    //std::cout<<"tesst "<<statement->prints()<<endl;
+                    if (aValue){
+                        //std::cout<<"tesst2"<<endl;
+                        list<UnionDefine*>::iterator uid;
+                        for (uid = unionDefine.begin(); uid != unionDefine.end(); uid++){
+                            if (strcmp(aValue, (*uid)->byteVar) == 0 ){
+                                byteVar = (*uid)->byteVar;
+                                bitName = (*(*uid)->bitVar)[i];
+                                break;
+                            }
+                        }
+                        if (!byteVar){
+                            cout<<"STATEMENT: "<<statement->prints()<<std::endl;
+                            cout<<"\t   RULE IS BROKEN!"<<std::endl;
+                            valid = false;
+                        }
+                    } else {
+                        cout<<"STATEMENT: "<<statement->prints()<<std::endl;
+                        cout<<"\t   RULE IS BROKEN!"<<std::endl;
+                        valid = false;
+                    }
+
+                }
+                if(byteVar){
+                Exp* reg = Location::local(statement->bitName, statement->getProc());
+                if (reg){
+                    Assign* assign = new Assign(reg, new Binary(opMemberAccess,
+                                                               new Binary(opMemberAccess, Location::global(byteVar, statement->getProc())
+                                                                          , new Const("bits")), new Const(bitName)));
+                    statement->replaceRef(reg, assign, convert);
+                }
+                }
+           }
+           else {
+                Exp* a =  Location::local("a", NULL);
+               list<Assign*> defList = statement->reachOut.findDef(a);
+               if (defList.size() == 1 && statement == defList.front()){
+                   statement->getProc()->removeStatement(statement);
+                   //std::cout<<"Statement1: "<<statement->prints()<<", "<<statement->isBitUse<<endl;
+               } else if (aValue){
+                   //std::cout<<"Statement2: "<<statement->prints()<<", "<<statement->isBitUse<<endl;
+                       Assign* assign = new Assign(Location::local("a", statement->getProc()), new Binary(opMemberAccess,
+                                                     Location::global(aValue, statement->getProc()), new Const("byte")));
+                       statement->replaceRef(Location::local("a", statement->getProc()), assign, convert);
+               }
+           }
+            bool removed = false;
+            Statement* parentStatement = NULL;
+            if (statement->accAssign && statement->accAssign->isAssign()){
+                numStmt.insert(statement->accAssign->getNumber());
+            }
+
+            if (statement->getAccAssign() && statement->isLastStatementInBB()){
+                numStmt.insert(statement->getNumber());
+            }
+        }
+
+    }
+    for (rit = m_pRtls->begin(); rit != m_pRtls->end(); rit++){
+        std::list<Statement*>& stmts = (*rit)->getList();
+        std::list<Statement*>::iterator sit;
+
+    for (sit = stmts.begin(); sit!=stmts.end(); sit++){
+        Statement* statement = (*sit);
+        std::cout<<"statement number: "<<statement->getNumber()<<", "<<(numStmt.find(statement->getNumber()) != numStmt.end())<<endl;
+        if (numStmt.find(statement->getNumber()) != numStmt.end())
+            statement->getProc()->removeStatement(statement);
+    }
+    }
+
     std::cout<<"==========================="<<endl;
     return valid;
 }

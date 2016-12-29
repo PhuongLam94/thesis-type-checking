@@ -1488,7 +1488,7 @@ void Prog::constantPropagation(){
             if (VERBOSE)
                     LOG << "decompiling entry point " << (*ee)->getName() << "\n";
             int indent = 0;
-            (*ee)->constantPropagation(map);
+            (*ee)->typePropagation(map);
 
     }
 
@@ -1503,7 +1503,7 @@ void Prog::constantPropagation(){
                             if (proc->isLib()) continue;
                             if (proc->isDecompiled()) continue;
                             int indent = 0;
-                            proc->constantPropagation(map);
+                            proc->typePropagation(map);
                             foundone = true;
                     }
             }

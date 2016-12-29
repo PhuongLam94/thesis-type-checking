@@ -3614,6 +3614,26 @@ bool Unary::accept(ExpVisitor* v) {
 	if (ret) ret = subExp1->accept(v);
 	return ret;
 }
+ConstantVariable* TypedExp::accept(ExpTypeVisitor *v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
+    return v->visit(this, m, replacement, proc);
+    //return NULL;
+    //return v->visit((Unary*)this);
+}
+ConstantVariable* Const::accept(ExpTypeVisitor *v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
+    return v->visit(this, m, replacement, proc);
+    //return NULL;
+    //return v->visit((Unary*)this);
+}
+ConstantVariable* RefExp::accept(ExpTypeVisitor *v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
+    return v->visit(this, m, replacement, proc);
+    //return NULL;
+    //return v->visit((Unary*)this);
+}
+ConstantVariable* Ternary::accept(ExpTypeVisitor *v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
+    return v->visit(this, m, replacement, proc);
+    //return NULL;
+    //return v->visit((Unary*)this);
+}
 ConstantVariable* TypedExp::accept(EvalExpressionVisitor *v, std::map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
     return v->visit(this, m, replacement, proc);
     //return NULL;

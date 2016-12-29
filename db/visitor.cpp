@@ -25,6 +25,76 @@
 #include "AssemblyInfo.h"
 #include "string.h"
 using namespace std;
+//ExpTypeVisitor class
+ConstantVariable* ExpTypeVisitor::visit(Const *c, map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
+    //std::cout<<"Visit constant expression "<<c->prints()<<std::endl;
+    ConstantVariable* retValue = new ConstantVariable();
+    if (!c->isIntConst()){
+        retValue->type = 3;
+    } else {
+        std::map<char*, AssemblyArgument*>::iterator mit;
+        bool exist = false;
+        for (mit = replacement.begin(); mit!=replacement.end(); mit++){
+            AssemblyArgument* arg = (*mit).second;
+            if (arg->kind == IMMEDIATE_INT && arg->value.i == c->getInt() )
+            {
+                retValue->type = 2;
+                retValue->variable = new Const((*mit).first);
+                exist = true;
+                break;
+            }
+        }
+        if (!exist)
+            retValue->type = 3;
+    }
+    return retValue;
+}
+ConstantVariable* ExpTypeVisitor::visit(Ternary *c, map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
+    //std::cout<<"Visit ternary expression "<<c->prints()<<std::endl;
+    return c->getSubExp3()->accept(this, m, replacement, proc);
+}
+ConstantVariable* ExpTypeVisitor::visit(TypedExp *c, std::map<Exp *, ConstantVariable *> m, std::map<char *, AssemblyArgument *> replacement, UserProc *proc){
+    std::cout<<"Visit typed exp: "<<c->prints()<<endl;
+    ConstantVariable* result = c->getSubExp1()->accept(this, m, replacement, proc);
+    return result;
+}
+ConstantVariable* ExpTypeVisitor::visit(RefExp *c, map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
+    //std::cout<<"Visit ref exp: "<<c->prints()<<", "<<c->getSubExp1()->getOper()<<endl;
+       //std::cout<<"test1"<<std::endl;
+    ConstantVariable* result = NULL;
+        if (c->getSubExp1()->isRegOf()){
+            //std::cout<<(m.find(c) == m.end())<<std::endl;
+            map<Exp*, ConstantVariable*>::iterator mit;
+            for (mit = m.begin(); mit!=m.end();mit++){
+                if ((*(*mit).first) == *c){
+                    result = (*mit).second;
+                }
+            }
+            if (!result) {
+                char* regName = proc->getRegName(c->getSubExp1());
+                std::map<char*, AssemblyArgument*>::iterator mmit;
+                char* typeName;
+                for (mmit = replacement.begin(); mmit!= replacement.end(); mmit++){
+                    //std::cout<<(*mmit).second->kind<<endl;
+                    if(strcmp((*mmit).first, regName) == 0 && (*mmit).second->kind == IMMEDIATE_INT){
+                            typeName = (*mmit).first;
+                    }
+                }
+                if (typeName){
+                    //std::cout<<regName<<replacement[regName]->value.i<<std::endl;
+                    result = new ConstantVariable();
+                    result->type = 2;
+                    result->variable = new Const(typeName);
+                }
+            }
+        } else {
+            result = new ConstantVariable();
+            result->type = 3;
+        }
+        if(!result)
+            result = new ConstantVariable();
+        return result;
+}
 //EvalExpressionVisitor class
 ConstantVariable* EvalExpressionVisitor::visit(Const *c, map<Exp*, ConstantVariable*> m,std::map<char*, AssemblyArgument*> replacement, UserProc* proc){
     std::cout<<"Visit constant expression "<<c->prints()<<std::endl;
