@@ -1,17 +1,25 @@
 AA
 		MOV
+					 DPTR 
+					 38 
+		MOVX
 					 A 
-					 OPTIONS 
-		JB
+					 DPTR 
+		SETB
 					 TESTSUPS 
-					 BB 
 		MOV
 					 A 
 					 OPTIONS 
-		SETB
-					 SIMP 
+		CLR
+					 A 
+		JB
+					 TESTSUPS2 
+					 BB 
+		MOV
+					 A 
+					 OPTIONS2 
 		RET
 BB
 		MOV
 					 A 
-					 OPTIONS 
+					 OPTIONS2 
