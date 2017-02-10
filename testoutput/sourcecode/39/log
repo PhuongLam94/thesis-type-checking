@@ -1,0 +1,5 @@
+got filename elf-init.c for main
+after removing matching assigns  (t[WILDSTR]).
+size 0x10 meet with size 0x20!
+### WARNING: iteration limit exceeded for dfaTypeAnalysis of procedure main ###
+### WARNING: iteration limit exceeded for dfaTypeAnalysis of procedure main ###
